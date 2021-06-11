@@ -8,12 +8,13 @@
   </head>
   <body>
     <div class="contAll">
-      <div class="formCont">
-        <h1 class="title">Enter Code</h1>
-        <input type="text">
-        <button class="siteBtn">Next ></button>
-      </div>
+      <video src="" class="video" style="display:none;"></video>
+      <canvas id="canvas" class="canvas" width="400" height="400"></canvas>
+      <h1 class="title colorDis"></h1>
+      <h1 class="title foundDis"></h1>
+      <div class="colorView" style="width:100px; height:100px;"></div>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

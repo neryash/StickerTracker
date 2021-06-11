@@ -3,6 +3,7 @@ body, html{
   height:100%;
   margin:0;
   padding:0;
+  box-sizing: border-box;
 }
 .contAll{
   width:100%;
@@ -12,6 +13,8 @@ body, html{
   padding:0;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 h1{
   margin:0;
@@ -21,8 +24,37 @@ h1{
 }
 .title{
   text-align:center;
+  font-size: 50px;
+}
+.siteInput{
+  background:transparent;
+  border-radius: 13px;
+  border:2px solid black;
+  width:80%;
+  padding:10px 10px;
+  margin:20px auto;
+  font-size: 18px;
+}
+.siteInput:focus{
+  outline:0;
+}
+.siteBtn{
+  background:#FFD600;
+  border-radius: 13px;
+  border:2px solid #FFD600;
+  width:calc(80% + 20px);
+  user-select: none;
+  padding:10px 10px;
+  margin:20px auto;
+  font-size: 18px;
+  box-shadow: 20px 20px 30px rgba(0, 0, 0, 0.25);
+}
+.siteBtn:focus{
+  outline:0;
 }
 .formCont{
   width:100%;
   height:max-content;
+  display: flex;
+  flex-direction: column;
 }
