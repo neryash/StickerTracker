@@ -39,12 +39,13 @@ const cavnas = document.querySelector(".canvas");
 const ctx = canvas.getContext('2d');
 // var red = {r:240,g:170,b:200};
 var red = {r:200,g:90,b:100};
+var white = {r:230,g:200,b:200};
 requestAnimationFrame(function loop() {
   ctx.drawImage(video, 0, 0, 400,600);
-  drawCross(60,10);
+  drawCross(80,10);
   secCounter++;
   // if(secCounter == 2){
-    analysis(60,red,30);
+    analysis(80,red,30);
     secCounter=0;
   // }
   requestAnimationFrame(loop);
@@ -102,11 +103,22 @@ function analysis(size,color,sensitivity) {
         generalCorners.left = currX;
       }
       if(generalCorners.right == undefined || currX > generalCorners.right){
-        console.log(currX,currY);
         pix[i] = 0;
         pix[i+1] = 255;
         pix[i+2] = 0;
         generalCorners.right = currX;
+      }
+      if(generalCorners.up == undefined || currY < generalCorners.up){
+        pix[i] = 0;
+        pix[i+1] = 255;
+        pix[i+2] = 0;
+        generalCorners.up = currY;
+      }
+      if(generalCorners.down == undefined || currY > generalCorners.down){
+        pix[i] = 0;
+        pix[i+1] = 255;
+        pix[i+2] = 0;
+        generalCorners.down = currY;
       }
     }
   }
@@ -127,10 +139,14 @@ function analysis(size,color,sensitivity) {
   ctx.strokeStyle = "green"
   ctx.lineWidth = 2;
   ctx.beginPath();
-ctx.moveTo(canvas.width/2-60+generalCorners.left,0);
-ctx.lineTo(canvas.width/2-60+generalCorners.left,canvas.height);
-ctx.moveTo(canvas.width/2-60+generalCorners.right,0);
-ctx.lineTo(canvas.width/2-60+generalCorners.right,canvas.height);
+ctx.moveTo(canvas.width/2-size+generalCorners.left,0);
+ctx.lineTo(canvas.width/2-size+generalCorners.left,canvas.height);
+ctx.moveTo(canvas.width/2-size+generalCorners.right,0);
+ctx.lineTo(canvas.width/2-size+generalCorners.right,canvas.height);
+ctx.moveTo(0,canvas.height/2-size+generalCorners.up);
+ctx.lineTo(canvas.width,canvas.height/2-size+generalCorners.up);
+ctx.moveTo(0,canvas.height/2-size+generalCorners.down);
+ctx.lineTo(canvas.width,canvas.height/2-size+generalCorners.down);
 ctx.stroke();
 
 }
