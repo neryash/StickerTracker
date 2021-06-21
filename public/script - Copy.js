@@ -134,43 +134,40 @@ function analysis(size,color,sensitivity) {
     ctx.rect(canvas.width/2-size+generalCorners.down[0]-10,canvas.width/2-size+generalCorners.down[1]-10,20,20);
     ctx.rect(canvas.width/2-size+generalCorners.up[0]-10,canvas.width/2-size+generalCorners.up[1]-10,20,20);
 
-    var topMiddle = generalCorners.down[0] < generalCorners.up[0] ? [(generalCorners.left[0]+generalCorners.up[0])/2,(generalCorners.left[1]+generalCorners.up[1])/2] : [(generalCorners.right[0]+generalCorners.up[0])/2,(generalCorners.right[1]+generalCorners.up[1])/2];
-    var bottomMiddle = generalCorners.down[0] > generalCorners.up[0] ? [(generalCorners.left[0]+generalCorners.down[0])/2,(generalCorners.left[1]+generalCorners.down[1])/2] : [(generalCorners.right[0]+generalCorners.down[0])/2,(generalCorners.right[1]+generalCorners.down[1])/2];
-    var leftMiddle = generalCorners.down[0] > generalCorners.up[0] ? [(generalCorners.left[0]+generalCorners.up[0])/2,(generalCorners.left[1]+generalCorners.up[1])/2] : [(generalCorners.left[0]+generalCorners.down[0])/2,(generalCorners.left[1]+generalCorners.down[1])/2];
-    var rightMiddle = generalCorners.down[0] < generalCorners.up[0] ? [(generalCorners.right[0]+generalCorners.up[0])/2,(generalCorners.right[1]+generalCorners.up[1])/2] : [(generalCorners.right[0]+generalCorners.down[0])/2,(generalCorners.right[1]+generalCorners.down[1])/2];
-    var centerPoint = getMiddleOfPoints({up:topMiddle,down:bottomMiddle});
+    // ctx.moveTo(canvas.width/2-size+generalCorners.left[0],0);
+    // ctx.lineTo(canvas.width/2-size+generalCorners.left[0],canvas.height);
+    // ctx.moveTo(canvas.width/2-size+generalCorners.right[0],0);
+    // ctx.lineTo(canvas.width/2-size+generalCorners.right[0],canvas.height);
+    // ctx.moveTo(0,canvas.height/2-size+generalCorners.up[1]);
+    // ctx.lineTo(canvas.width,canvas.height/2-size+generalCorners.up[1]);
+    // ctx.moveTo(0,canvas.height/2-size+generalCorners.down[1]);
+    // ctx.lineTo(canvas.width,canvas.height/2-size+generalCorners.down[1]);
+    // ctx.stroke();
+    var topMiddle = generalCorners.down[0] < generalCorners.up[0] ? [(canvas.width/2-size+generalCorners.left[0]+canvas.width/2-size+generalCorners.up[0])/2,(canvas.height/2-size+generalCorners.left[1]+canvas.height/2-size+generalCorners.up[1])/2] : [(canvas.width/2-size+generalCorners.right[0]+canvas.width/2-size+generalCorners.up[0])/2,(canvas.height/2-size+generalCorners.right[1]+canvas.height/2-size+generalCorners.up[1])/2];
+    var bottomMiddle = generalCorners.down[0] > generalCorners.up[0] ? [(canvas.width/2-size+generalCorners.left[0]+canvas.width/2-size+generalCorners.down[0])/2,(canvas.height/2-size+generalCorners.left[1]+canvas.height/2-size+generalCorners.down[1])/2] : [(canvas.width/2-size+generalCorners.right[0]+canvas.width/2-size+generalCorners.down[0])/2,(canvas.height/2-size+generalCorners.right[1]+canvas.height/2-size+generalCorners.down[1])/2];
+    var middles = {t:[(canvas.width/2-size+generalCorners.left[0]+canvas.width/2-size+generalCorners.up[0])/2,(canvas.height/2-size+generalCorners.left[1]+canvas.height/2-size+generalCorners.up[1])/2],
+    l:[(canvas.width/2-size+generalCorners.left[0]+canvas.width/2-size+generalCorners.down[0])/2,(canvas.height/2-size+generalCorners.left[1]+canvas.height/2-size+generalCorners.down[1])/2],
+    r:[(canvas.width/2-size+generalCorners.right[0]+canvas.width/2-size+generalCorners.down[0])/2,(canvas.height/2-size+generalCorners.right[1]+canvas.height/2-size+generalCorners.down[1])/2],
+    b:[(canvas.width/2-size+generalCorners.left[0]+canvas.width/2-size+generalCorners.up[0])/2,(canvas.height/2-size+generalCorners.left[1]+canvas.height/2-size+generalCorners.up[1])/2],}
     ctx.moveTo(canvas.width/2-size+generalCorners.left[0],canvas.height/2-size+generalCorners.left[1]);
     ctx.lineTo(canvas.width/2-size+generalCorners.up[0],canvas.width/2-size+generalCorners.up[1]);
-    ctx.lineTo(canvas.width/2-size+generalCorners.right[0],canvas.height/2-size+generalCorners.right[1]);
+    ctx.lineTo(canvas.width/2-size+generalCorners.right[0],canvas.height/2-size+generalCorners. right[1]);
     ctx.lineTo(canvas.width/2-size+generalCorners.down[0],canvas.height/2-size+generalCorners.down[1]);
     ctx.lineTo(canvas.width/2-size+generalCorners.left[0],canvas.height/2-size+generalCorners.left[1]);
     ctx.stroke();
     ctx.strokeStyle = "black"
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.rect(canvas.width/2-size+topMiddle[0]-10,canvas.width/2-size+topMiddle[1]-10,20,20); //TOP MIDDLE WORKS
-    ctx.rect(canvas.width/2-size+bottomMiddle[0]-10,canvas.width/2-size+bottomMiddle[1]-10,20,20); //BOTTOM MIDDLE WORKS
-    ctx.rect(canvas.width/2-size+leftMiddle[0]-10,canvas.width/2-size+leftMiddle[1]-10,20,20); //LEFT MIDDLE WORKS
-    ctx.rect(canvas.width/2-size+rightMiddle[0]-10,canvas.width/2-size+rightMiddle[1]-10,20,20); //RIGHT MIDDLE WORKS
-    ctx.rect(canvas.width/2-size+centerPoint[0]-10,canvas.width/2-size+centerPoint[1]-10,20,20); //MIDDLE WORKS
-    ctx.moveTo(canvas.width/2-size+topMiddle[0],canvas.width/2-size+topMiddle[1]);
-    ctx.lineTo(canvas.width/2-size+bottomMiddle[0],canvas.width/2-size+bottomMiddle[1]);
-    ctx.moveTo(canvas.width/2-size+leftMiddle[0],canvas.width/2-size+leftMiddle[1]);
-    ctx.lineTo(canvas.width/2-size+rightMiddle[0],canvas.width/2-size+rightMiddle[1]);
+    ctx.rect(topMiddle[0]-10,topMiddle[1]-10,20,20); //TOP MIDDLE WORKS
+    ctx.rect(bottomMiddle[0]-10,bottomMiddle[1]-10,20,20); //BOTTOM MIDDLE WORKS
+    // ctx.rect(middles.l[0]-10,middles.l[1]-10,20,20);
+    // ctx.rect(middles.r[0]-10,middles.r[1]-10,20,20);
+    // ctx.rect(middles.b[0]-10,middles.b[1]-10,20,20);
     ctx.stroke();
-
-    var middleOfSquares = {tl:getMiddleOfPoints({up:leftMiddle,down:topMiddle}),
-      tr:getMiddleOfPoints({up:rightMiddle,down:topMiddle}),
-      br:getMiddleOfPoints({up:bottomMiddle,down:rightMiddle}),
-      bl:getMiddleOfPoints({up:bottomMiddle,down:leftMiddle})};
-
     ctx.strokeStyle = "red"
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.rect(canvas.width/2-size+middleOfSquares.tl[0]-10,canvas.width/2-size+middleOfSquares.tl[1]-10,20,20);
-    ctx.rect(canvas.width/2-size+middleOfSquares.br[0]-10,canvas.width/2-size+middleOfSquares.br[1]-10,20,20);
-    ctx.rect(canvas.width/2-size+middleOfSquares.tr[0]-10,canvas.width/2-size+middleOfSquares.tr[1]-10,20,20);
-    ctx.rect(canvas.width/2-size+middleOfSquares.bl[0]-10,canvas.width/2-size+middleOfSquares.bl[1]-10,20,20);
+    ctx.rect(canvas.width/2-size+generalCorners.up[0]-10,canvas.width/2-size+generalCorners.up[1]-10,20,20);
     ctx.stroke();
 
     return {l:[generalCorners.left[0],generalCorners.left[1]],
@@ -180,10 +177,6 @@ function analysis(size,color,sensitivity) {
   }
   return false;
 
-}
-
-function getMiddleOfPoints(points){
-  return [(points.up[0]+points.down[0])/2,(points.up[1]+points.down[1])/2]
 }
 
 function getSide(startCoor,imageArr,color,sensitivity,size) {
