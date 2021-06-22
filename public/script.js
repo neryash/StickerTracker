@@ -27,9 +27,9 @@ const cavnas = document.querySelector(".canvas");
 const ctx = canvas.getContext('2d');
 // var black = {r:240,g:170,b:200};
 var black = {r:30,g:30,b:30};
+var white = {r:230,g:230,b:230};
 var generalCorners = {up:{x:0,y:0},down:{x:0,y:0},left:{x:0,y:0},right:{x:0,y:0}};
 // var black = {r:220,g:120,b:170};
-var white = {r:230,g:200,b:200};
 requestAnimationFrame(function loop() {
 
   secCounter++;
@@ -49,7 +49,6 @@ function distanceBetween(point,pointa){
 
 function getQuarters(corners){
   if(corners){
-    console.log(corners);
     document.querySelector(".foundDis").innerHTML = distanceBetween(corners.l,corners.b) + " * " + distanceBetween(corners.l,corners.r);
   }
 
@@ -76,6 +75,7 @@ function drawCross(size,middleSquare) {
   ctx.lineTo(cavnas.width/2+size, canvas.height/2+size/2);
   ctx.stroke();
 }
+    var bottomCorner = "";
 var imagePixels = [];
 function analysis(size,color,sensitivity) {
   var imgd = ctx.getImageData(cavnas.width/2-size, canvas.height/2-size, size*2,size*2);
@@ -117,7 +117,7 @@ function analysis(size,color,sensitivity) {
 
   }
   var middle = findMiddle(pix);
-  document.querySelector(".colorDis").innerHTML = pix[middle] + ", " + pix[middle+1] + ", " + pix[middle+2];
+
   document.querySelector(".colorView").style.backgroundColor = "rgb("+pix[middle] + ","+ pix[middle+1] + ", " + pix[middle+2]+")"
   pix[middle] = 0;
   pix[middle+1] = 0;
@@ -164,6 +164,20 @@ function analysis(size,color,sensitivity) {
       br:getMiddleOfPoints({up:bottomMiddle,down:rightMiddle}),
       bl:getMiddleOfPoints({up:bottomMiddle,down:leftMiddle})};
 
+    if(checkColors(imagePixels[Math.floor(middleOfSquares.tr[0])][Math.floor(middleOfSquares.tr[1])],white,30)){
+      bottomCorner = "tr";
+    }
+    if(checkColors(imagePixels[Math.floor(middleOfSquares.tl[0])][Math.floor(middleOfSquares.tl[1])],white,30)){
+      bottomCorner = "tl";
+    }
+    if(checkColors(imagePixels[Math.floor(middleOfSquares.br[0])][Math.floor(middleOfSquares.br[1])],white,30)){
+      bottomCorner = "br";
+    }
+    if(checkColors(imagePixels[Math.floor(middleOfSquares.bl[0])][Math.floor(middleOfSquares.bl[1])],white,30)){
+      bottomCorner = "bl";
+    }
+    document.querySelector(".colorDis").innerHTML = bottomCorner;
+
     ctx.strokeStyle = "red"
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -171,6 +185,13 @@ function analysis(size,color,sensitivity) {
     ctx.rect(canvas.width/2-size+middleOfSquares.br[0]-10,canvas.width/2-size+middleOfSquares.br[1]-10,20,20);
     ctx.rect(canvas.width/2-size+middleOfSquares.tr[0]-10,canvas.width/2-size+middleOfSquares.tr[1]-10,20,20);
     ctx.rect(canvas.width/2-size+middleOfSquares.bl[0]-10,canvas.width/2-size+middleOfSquares.bl[1]-10,20,20);
+    ctx.stroke();
+    ctx.strokeStyle = "blue"
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    if(bottomCorner != ""){
+      ctx.rect(canvas.width/2-size+middleOfSquares[bottomCorner][0]-10,canvas.width/2-size+middleOfSquares[bottomCorner][1]-10,20,20);
+    }
     ctx.stroke();
 
     return {l:[generalCorners.left[0],generalCorners.left[1]],
@@ -180,6 +201,24 @@ function analysis(size,color,sensitivity) {
   }
   return false;
 
+}
+
+function checkColors(colora,colorb,marginOfErr) {
+  if(marginOfErr == 0){
+    marginOfErr = 1;
+  }
+  // console.log(colora.r,colorb.r);
+  if(within(colora.r,colorb.r,marginOfErr)&& within(colora.g,colorb.g,marginOfErr)&&within(colora.b,colorb.b,marginOfErr)){
+    return true;
+  }
+  return false;
+}
+
+function within(numa,numb,numc) {
+  if(numa<numb+numc && numa > numb-numc){
+    return true;
+  }
+  return false;
 }
 
 function getMiddleOfPoints(points){
