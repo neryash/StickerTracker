@@ -18,9 +18,23 @@ var constraints = {
   }
 };
 
+var torcha = false;
+
 /* Stream it to video element */
 navigator.mediaDevices.getUserMedia(constraints).then(function success(stream) {
   video.srcObject = stream;
+  const track = stream.getVideoTracks()[0];
+
+  const imageCapture = new ImageCapture(track)
+  const photoCapabilities = imageCapture.getPhotoCapabilities().then(() => {
+    const btn = document.querySelector('.switch');
+    canvas.addEventListener('click', function(){
+      track.applyConstraints({
+        advanced: [{torch: torcha}]
+      });
+      torcha = !torcha;
+    });
+  });
 });
 
 const cavnas = document.querySelector(".canvas");
@@ -33,10 +47,15 @@ var generalCorners = {up:{x:0,y:0},down:{x:0,y:0},left:{x:0,y:0},right:{x:0,y:0}
 requestAnimationFrame(function loop() {
 
   secCounter++;
-  if(secCounter == 1){
+  if(secCounter == 2){
+    // ctx.fillStyle = "hsl(0,100%,50%)";  // saturation at 100%
     ctx.drawImage(video, 0, 0, 400,600);
+    ctx.globalCompositeOperation = "saturation";
+    ctx.fillStyle = "hsl(0,100%,0%)";  // saturation at 100%
+    ctx.fillRect(0,0,canvas.width,canvas.height);  // apply the comp filter
+    ctx.globalCompositeOperation = "source-over";
     drawCross(80,10);
-    let corners = analysis(80,black,30);
+    let corners = analysis(80,black,40);
     getQuarters(corners);
     secCounter=0;
   }
@@ -49,7 +68,7 @@ function distanceBetween(point,pointa){
 
 function getQuarters(corners){
   if(corners){
-    document.querySelector(".foundDis").innerHTML = distanceBetween(corners.l,corners.b) + " * " + distanceBetween(corners.l,corners.r);
+    // document.querySelector(".foundDis").innerHTML = distanceBetween(corners.l,corners.b) + " * " + distanceBetween(corners.l,corners.r);
   }
 
 }
@@ -75,7 +94,9 @@ function drawCross(size,middleSquare) {
   ctx.lineTo(cavnas.width/2+size, canvas.height/2+size/2);
   ctx.stroke();
 }
-    var bottomCorner = "";
+var bottomCorner = "";
+var refCorner = "";
+var pixelSize = (screen.width/calcScreenDPI()*2.54)/screen.width;
 var imagePixels = [];
 function analysis(size,color,sensitivity) {
   var imgd = ctx.getImageData(cavnas.width/2-size, canvas.height/2-size, size*2,size*2);
@@ -94,7 +115,8 @@ function analysis(size,color,sensitivity) {
         imagePixels.push(row);
         row = [];
       }
-      if(pix[i] > color.r-sensitivity && pix[i] < color.r+sensitivity && pix[i+1] > color.g-sensitivity && pix[i+1] < color.g+sensitivity && pix[i+2] > color.b-sensitivity && pix[i+2] < color.b+sensitivity){
+
+      if(checkColors({r:pix[i],g:pix[i+1],b:pix[i+2]},color,sensitivity)){
         // pix[i] = 0;
         // pix[i+1] = 0;
         // pix[i+2] = 0;
@@ -139,6 +161,11 @@ function analysis(size,color,sensitivity) {
     var leftMiddle = generalCorners.down[0] > generalCorners.up[0] ? [(generalCorners.left[0]+generalCorners.up[0])/2,(generalCorners.left[1]+generalCorners.up[1])/2] : [(generalCorners.left[0]+generalCorners.down[0])/2,(generalCorners.left[1]+generalCorners.down[1])/2];
     var rightMiddle = generalCorners.down[0] < generalCorners.up[0] ? [(generalCorners.right[0]+generalCorners.up[0])/2,(generalCorners.right[1]+generalCorners.up[1])/2] : [(generalCorners.right[0]+generalCorners.down[0])/2,(generalCorners.right[1]+generalCorners.down[1])/2];
     var centerPoint = getMiddleOfPoints({up:topMiddle,down:bottomMiddle});
+
+    var pixelDistance = Math.sqrt(Math.pow(leftMiddle[0]-rightMiddle[0],2)+Math.pow(leftMiddle[1]-rightMiddle[0],2));
+    var height = 
+    document.querySelector(".colorDis").innerHTML = ((pixelDistance*pixelSize)*(canvas.width/200)+"").substring(0,5);
+
     ctx.moveTo(canvas.width/2-size+generalCorners.left[0],canvas.height/2-size+generalCorners.left[1]);
     ctx.lineTo(canvas.width/2-size+generalCorners.up[0],canvas.width/2-size+generalCorners.up[1]);
     ctx.lineTo(canvas.width/2-size+generalCorners.right[0],canvas.height/2-size+generalCorners.right[1]);
@@ -164,19 +191,34 @@ function analysis(size,color,sensitivity) {
       br:getMiddleOfPoints({up:bottomMiddle,down:rightMiddle}),
       bl:getMiddleOfPoints({up:bottomMiddle,down:leftMiddle})};
 
-    if(checkColors(imagePixels[Math.floor(middleOfSquares.tr[0])][Math.floor(middleOfSquares.tr[1])],white,30)){
+    if(checkColors(imagePixels[Math.floor(middleOfSquares.tr[1])][Math.floor(middleOfSquares.tr[0])],white,30)){
       bottomCorner = "tr";
+      refCorner = "br";
     }
-    if(checkColors(imagePixels[Math.floor(middleOfSquares.tl[0])][Math.floor(middleOfSquares.tl[1])],white,30)){
+    if(checkColors(imagePixels[Math.floor(middleOfSquares.tl[1])][Math.floor(middleOfSquares.tl[0])],white,30)){
       bottomCorner = "tl";
+      refCorner = "tr";
     }
-    if(checkColors(imagePixels[Math.floor(middleOfSquares.br[0])][Math.floor(middleOfSquares.br[1])],white,30)){
+    if(checkColors(imagePixels[Math.floor(middleOfSquares.br[1])][Math.floor(middleOfSquares.br[0])],white,30)){
       bottomCorner = "br";
+      refCorner = "bl";
     }
-    if(checkColors(imagePixels[Math.floor(middleOfSquares.bl[0])][Math.floor(middleOfSquares.bl[1])],white,30)){
+    if(checkColors(imagePixels[Math.floor(middleOfSquares.bl[1])][Math.floor(middleOfSquares.bl[0])],white,30)){
       bottomCorner = "bl";
+      refCorner = "tl";
     }
-    document.querySelector(".colorDis").innerHTML = bottomCorner;
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "yellow";
+    ctx.beginPath();
+    // for(var i = 0; i < imagePixels.length; i++){
+    //   for(var j = 0; j < imagePixels[i].length; j++){
+    //     if(checkColors(imagePixels[i][j],white,sensitivity)){
+    //       ctx.rect(canvas.width/2-size+j-0,canvas.width/2-size+i-0,1,1);
+    //     }
+    //   }
+    // }
+    ctx.stroke();
 
     ctx.strokeStyle = "red"
     ctx.lineWidth = 2;
@@ -190,7 +232,10 @@ function analysis(size,color,sensitivity) {
     ctx.lineWidth = 2;
     ctx.beginPath();
     if(bottomCorner != ""){
+      console.log(middleOfSquares[bottomCorner]);
       ctx.rect(canvas.width/2-size+middleOfSquares[bottomCorner][0]-10,canvas.width/2-size+middleOfSquares[bottomCorner][1]-10,20,20);
+      let angle = calculateAngleFromX({x:middleOfSquares[bottomCorner][0],y:middleOfSquares[bottomCorner][1]},{x:middleOfSquares[refCorner][0],y:middleOfSquares[refCorner][1]})
+      document.querySelector(".foundDis").innerHTML = Math.floor(angle);
     }
     ctx.stroke();
 
@@ -201,6 +246,20 @@ function analysis(size,color,sensitivity) {
   }
   return false;
 
+}
+
+function calcScreenDPI() {
+    const el = document.createElement('div');
+    el.style = 'width: 1in;'
+    document.body.appendChild(el);
+    const dpi = el.offsetWidth;
+    document.body.removeChild(el);
+
+    return dpi;
+}
+
+function calculateAngleFromX(pointa,pointb){
+  return Math.atan2((pointa.y-pointb.y),(pointa.x-pointb.x))*180 / Math.PI;
 }
 
 function checkColors(colora,colorb,marginOfErr) {
@@ -239,7 +298,6 @@ function getSide(startCoor,imageArr,color,sensitivity,size) {
         break;
       }
       xIndex = i;
-      // console.log(imageArr[i][yIndex].r > color.r-sensitivity && imageArr[i][yIndex].r < color.r+sensitivity && imageArr[i][yIndex].g > color.g-sensitivity && imageArr[i][yIndex].g < color.g+sensitivity && imageArr[i][yIndex].b > color.b-sensitivity && imageArr[i][yIndex].b < color.b+sensitivity);
       if(imageArr[i][yIndex].r > color.r-sensitivity && imageArr[i][yIndex].r < color.r+sensitivity && imageArr[i][yIndex].g > color.g-sensitivity && imageArr[i][yIndex].g < color.g+sensitivity && imageArr[i][yIndex].b > color.b-sensitivity && imageArr[i][yIndex].b < color.b+sensitivity){
         coors.push([xIndex,yIndex])
         colorFounda = true;
