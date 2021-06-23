@@ -96,6 +96,7 @@ function drawCross(size,middleSquare) {
 }
 var bottomCorner = "";
 var refCorner = "";
+var STICKER_SIZE = 7;
 var pixelSize = (screen.width/calcScreenDPI()*2.54)/screen.width;
 var imagePixels = [];
 function analysis(size,color,sensitivity) {
@@ -163,8 +164,8 @@ function analysis(size,color,sensitivity) {
     var centerPoint = getMiddleOfPoints({up:topMiddle,down:bottomMiddle});
 
     var pixelDistance = Math.sqrt(Math.pow(leftMiddle[0]-rightMiddle[0],2)+Math.pow(leftMiddle[1]-rightMiddle[0],2));
-    var height = 
-    document.querySelector(".colorDis").innerHTML = ((pixelDistance*pixelSize)*(canvas.width/200)+"").substring(0,5);
+    var height = STICKER_SIZE/pixelDistance*335;
+    document.querySelector(".colorDis").innerHTML = (height+"").substring(0,5);
 
     ctx.moveTo(canvas.width/2-size+generalCorners.left[0],canvas.height/2-size+generalCorners.left[1]);
     ctx.lineTo(canvas.width/2-size+generalCorners.up[0],canvas.width/2-size+generalCorners.up[1]);
@@ -236,6 +237,7 @@ function analysis(size,color,sensitivity) {
       ctx.rect(canvas.width/2-size+middleOfSquares[bottomCorner][0]-10,canvas.width/2-size+middleOfSquares[bottomCorner][1]-10,20,20);
       let angle = calculateAngleFromX({x:middleOfSquares[bottomCorner][0],y:middleOfSquares[bottomCorner][1]},{x:middleOfSquares[refCorner][0],y:middleOfSquares[refCorner][1]})
       document.querySelector(".foundDis").innerHTML = Math.floor(angle);
+      transmitData(angle,height,0);
     }
     ctx.stroke();
 
@@ -282,6 +284,10 @@ function within(numa,numb,numc) {
 
 function getMiddleOfPoints(points){
   return [(points.up[0]+points.down[0])/2,(points.up[1]+points.down[1])/2]
+}
+
+function transmitData(yaw,distance,roll){
+  socket.emit("move",{yaw:yaw,dist:distance,roll:roll});
 }
 
 function getSide(startCoor,imageArr,color,sensitivity,size) {

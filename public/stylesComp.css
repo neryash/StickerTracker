@@ -17,7 +17,7 @@ body, html{
   justify-content: center;
 }
 .phone{
-  width:10vw;
+  width:20vw;
   height:10vh;
   transform: translateX(-50%) translateY(-50%);
   position: absolute;
@@ -25,4 +25,9 @@ body, html{
   left:50%;
   border-radius:15px;
   background-color:red;
+}
+.distance{
+  position: absolute;
+  top:10%;
+  left:10%;
 }
