@@ -1,5 +1,5 @@
 const makeCert = require("make-cert")
-const {key, cert} = makeCert('192.168.1.35')
+const {key, cert} = makeCert('192.168.1.19')
 console.log(key)
 console.log(cert)
 
@@ -34,5 +34,5 @@ app.get("/comp",function(req,res) {
 })
 
 httpServer.listen(3000,function(){
-  console.log("listening");
+  console.log("listening on 3000");
 });

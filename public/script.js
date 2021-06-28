@@ -41,7 +41,7 @@ const cavnas = document.querySelector(".canvas");
 const ctx = canvas.getContext('2d');
 // var black = {r:240,g:170,b:200};
 var black = {r:30,g:30,b:30};
-var white = {r:230,g:230,b:230};
+var white = {r:220,g:220,b:220};
 var generalCorners = {up:{x:0,y:0},down:{x:0,y:0},left:{x:0,y:0},right:{x:0,y:0}};
 // var black = {r:220,g:120,b:170};
 requestAnimationFrame(function loop() {
@@ -152,10 +152,10 @@ function analysis(size,color,sensitivity) {
     ctx.strokeStyle = "green"
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.rect(canvas.width/2-size+generalCorners.left[0]-10,canvas.width/2-size+generalCorners.left[1]-10,20,20);
-    ctx.rect(canvas.width/2-size+generalCorners.right[0]-10,canvas.width/2-size+generalCorners.right[1]-10,20,20);
-    ctx.rect(canvas.width/2-size+generalCorners.down[0]-10,canvas.width/2-size+generalCorners.down[1]-10,20,20);
-    ctx.rect(canvas.width/2-size+generalCorners.up[0]-10,canvas.width/2-size+generalCorners.up[1]-10,20,20);
+    // ctx.rect(canvas.width/2-size+generalCorners.left[0]-10,canvas.width/2-size+generalCorners.left[1]-10,20,20);
+    // ctx.rect(canvas.width/2-size+generalCorners.right[0]-10,canvas.width/2-size+generalCorners.right[1]-10,20,20);
+    // ctx.rect(canvas.width/2-size+generalCorners.down[0]-10,canvas.width/2-size+generalCorners.down[1]-10,20,20);
+    // ctx.rect(canvas.width/2-size+generalCorners.up[0]-10,canvas.width/2-size+generalCorners.up[1]-10,20,20);
 
     var topMiddle = generalCorners.down[0] < generalCorners.up[0] ? [(generalCorners.left[0]+generalCorners.up[0])/2,(generalCorners.left[1]+generalCorners.up[1])/2] : [(generalCorners.right[0]+generalCorners.up[0])/2,(generalCorners.right[1]+generalCorners.up[1])/2];
     var bottomMiddle = generalCorners.down[0] > generalCorners.up[0] ? [(generalCorners.left[0]+generalCorners.down[0])/2,(generalCorners.left[1]+generalCorners.down[1])/2] : [(generalCorners.right[0]+generalCorners.down[0])/2,(generalCorners.right[1]+generalCorners.down[1])/2];
@@ -167,11 +167,11 @@ function analysis(size,color,sensitivity) {
     var height = STICKER_SIZE/pixelDistance*335;
     document.querySelector(".colorDis").innerHTML = (height+"").substring(0,5);
 
-    ctx.moveTo(canvas.width/2-size+generalCorners.left[0],canvas.height/2-size+generalCorners.left[1]);
-    ctx.lineTo(canvas.width/2-size+generalCorners.up[0],canvas.width/2-size+generalCorners.up[1]);
-    ctx.lineTo(canvas.width/2-size+generalCorners.right[0],canvas.height/2-size+generalCorners.right[1]);
-    ctx.lineTo(canvas.width/2-size+generalCorners.down[0],canvas.height/2-size+generalCorners.down[1]);
-    ctx.lineTo(canvas.width/2-size+generalCorners.left[0],canvas.height/2-size+generalCorners.left[1]);
+    // ctx.moveTo(canvas.width/2-size+generalCorners.left[0],canvas.height/2-size+generalCorners.left[1]);
+    // ctx.lineTo(canvas.width/2-size+generalCorners.up[0],canvas.width/2-size+generalCorners.up[1]);
+    // ctx.lineTo(canvas.width/2-size+generalCorners.right[0],canvas.height/2-size+generalCorners.right[1]);
+    // ctx.lineTo(canvas.width/2-size+generalCorners.down[0],canvas.height/2-size+generalCorners.down[1]);
+    // ctx.lineTo(canvas.width/2-size+generalCorners.left[0],canvas.height/2-size+generalCorners.left[1]);
     ctx.stroke();
     ctx.strokeStyle = "black"
     ctx.lineWidth = 2;
@@ -233,13 +233,14 @@ function analysis(size,color,sensitivity) {
     ctx.lineWidth = 2;
     ctx.beginPath();
     if(bottomCorner != ""){
-      console.log(middleOfSquares[bottomCorner]);
       ctx.rect(canvas.width/2-size+middleOfSquares[bottomCorner][0]-10,canvas.width/2-size+middleOfSquares[bottomCorner][1]-10,20,20);
       let angle = calculateAngleFromX({x:middleOfSquares[bottomCorner][0],y:middleOfSquares[bottomCorner][1]},{x:middleOfSquares[refCorner][0],y:middleOfSquares[refCorner][1]})
       document.querySelector(".foundDis").innerHTML = Math.floor(angle);
       transmitData(angle,height,0);
     }
     ctx.stroke();
+
+    getSusPoints(imagePixels,size,40,3);
 
     return {l:[generalCorners.left[0],generalCorners.left[1]],
     r:[generalCorners.right[0],generalCorners.right[1]],
@@ -248,6 +249,68 @@ function analysis(size,color,sensitivity) {
   }
   return false;
 
+}
+
+function getSusPoints(arr,size,sensitivity,moe){
+  let generalCornersa={};
+  var susPoints = [];
+  var susPoint = {down:[0,0]};
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "green";
+  ctx.beginPath();
+  for(var i = moe; i < arr.length-moe; i++){
+    for(var j = moe; j < arr[i].length-moe;j++){
+      // if(i%20 == 0 && j%20 == 0){
+      //   ctx.rect(canvas.width/2-size+i-10,canvas.width/2-size+j-10,20,20);
+      // }
+      var topLeftPoint = checkColors(arr[j][i],black,sensitivity) && checkColors(arr[j-moe][i],white,sensitivity) && checkColors(arr[j-moe][i-moe],white,sensitivity) && checkColors(arr[j][i-moe],white,sensitivity);
+      var topRightPoint = checkColors(arr[j][i],black,sensitivity) && checkColors(arr[j-moe][i],white,sensitivity) && checkColors(arr[j-moe][i+moe],white,sensitivity) && checkColors(arr[j][i+moe],white,sensitivity);
+      var bottomLeftPoint = checkColors(arr[j][i],black,sensitivity) && checkColors(arr[j+moe][i],white,sensitivity) && checkColors(arr[j+moe][i-moe],white,sensitivity) && checkColors(arr[j][i-moe],white,sensitivity);
+      var bottomRightPoint = checkColors(arr[j][i],black,sensitivity) && checkColors(arr[j+moe][i],white,sensitivity) && checkColors(arr[j+moe][i+moe],white,sensitivity) && checkColors(arr[j][i+moe],white,sensitivity);
+      if(bottomRightPoint || topLeftPoint || bottomLeftPoint || topRightPoint){
+        // ctx.rect(canvas.width/2-size+i-5,canvas.width/2-size+j-5,10,10);
+      }
+      if(bottomRightPoint || topLeftPoint || bottomLeftPoint || topRightPoint){
+        if(generalCornersa.left == undefined || i < generalCornersa.left[0]){
+          generalCornersa.left = [i,j];
+        }
+        if(generalCornersa.right == undefined || i > generalCornersa.right[0]){
+          generalCornersa.right = [i,j];
+        }
+        if(generalCornersa.up == undefined || j < generalCornersa.up[1]){
+          generalCornersa.up = [i,j];
+        }
+        if(generalCornersa.down == undefined || j > generalCornersa.down[1]){
+          generalCornersa.down = [i,j];
+        }
+      }
+      if(bottomRightPoint){
+        if((j > susPoint.down[1]) || !susPoint.down){
+          susPoint.down = [i,j];
+        }
+      }
+      if(bottomLeftPoint){
+        susPoint.bl = [i,j];
+      }
+      if(topRightPoint){
+        susPoint.tr = [i,j];
+      }
+      if(topLeftPoint){
+        susPoint.tl = [i,j];
+      }
+    }
+  }
+  ctx.stroke();
+  ctx.strokeStyle = "orange";
+  ctx.beginPath();
+  if(generalCornersa.left && generalCornersa.right && generalCornersa.up && generalCornersa.down){
+    ctx.rect(canvas.width/2-size+generalCornersa.left[0]-5,canvas.width/2-size+generalCornersa.left[1]-5,10,10);
+    ctx.rect(canvas.width/2-size+generalCornersa.right[0]-5,canvas.width/2-size+generalCornersa.right[1]-5,10,10);
+    ctx.rect(canvas.width/2-size+generalCornersa.up[0]-5,canvas.width/2-size+generalCornersa.up[1]-5,10,10);
+    ctx.rect(canvas.width/2-size+generalCornersa.down[0]-5,canvas.width/2-size+generalCornersa.down[1]-5,10,10);
+  }
+  ctx.stroke();
+  return generalCornersa;
 }
 
 function calcScreenDPI() {
